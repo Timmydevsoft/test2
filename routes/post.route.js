@@ -1,12 +1,13 @@
 import express from "express"
 import { createPost, getAllPost, getPostById, deletePost, updatePost } from "../controllers/post.controller.js"
-import { verifyCookie } from "../middleware/auth.middleware.js"
+import { verifyAuth } from "../middleware/auth.middleware.js"
 
 const postRouter = express.Router()
-postRouter.route("/post").post(createPost)
-postRouter.route("/post").get(verifyCookie, getAllPost)
-postRouter.route("/post/:id").get(verifyCookie), getPostById
-postRouter.route("/post/:id").put(verifyCookie,  updatePost)
-postRouter.route("/post/:id").delete(verifyCookie, deletePost)
+verifyAuth
+postRouter.route("/post").post(verifyAuth, createPost)
+postRouter.route("/post").get(verifyAuth, getAllPost)
+postRouter.route("/post/:id").get(verifyAuth,getPostById)
+postRouter.route("/post/:id").put(verifyAuth,  updatePost)
+postRouter.route("/post/:id").delete(verifyAuth, deletePost)
 
 export default postRouter

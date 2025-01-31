@@ -7,7 +7,8 @@ const createPost = async(req, res, next)=>{
       }
       const newUser = new Post({
         title,
-        body
+        body,
+        userId:req.id
       });
       await newUser.save()
       return res.status(201).json("post creacted succesfully");
@@ -21,8 +22,7 @@ const createPost = async(req, res, next)=>{
     try{
         const posts = await Post.find({userId: req.id})
         if(!posts) return res.status(401).json({message: "user does not have a post"})
-        const{ userId, ...rest} = posts
-        res.status(200).json(rest)
+        res.status(200).json(posts)
     }
     catch(err){
         next(err)
@@ -47,7 +47,7 @@ const createPost = async(req, res, next)=>{
         const uniquePost = await Post.findById(id, {})
         if(!uniquePost) return res.status(403).json({message: "No such post"})
         if(uniquePost && uniquePost.userId == req.id){
-            const updatePost = await Post.findByIdAndUpdate(req.params.id, {
+             await Post.findByIdAndUpdate(req.params.id, {
                 $set: {
                   title: req.body.title,
                   body: req.body.body
@@ -65,11 +65,11 @@ const createPost = async(req, res, next)=>{
     try{
         const{id}= req.params
         const availablePost  = await Post.findById(id)
-        if(!availablePost){
-            return res.staus(400).json({message: "No such post"})
-        }
+        if(!availablePost) return res.status(400).json({message: "No such post"})
+
         if( availablePost && availablePost.userId == req.id){
             await Post.findByIdAndDelete(id)}
+            return res.status(200).json({message: "Deleted successfully"})
         }
           
     catch(err){

@@ -24,8 +24,8 @@ const createUser = async(req, res, next)=>{
 
 const getAuser = async(req, res, next)=>{
   try{
-    const {id} = req.params
-    const isAuser = await User.findById(id)
+    console.log(req.params.id)
+    const isAuser = await User.findById(req.params.id)
     if(!isAuser) return next(handleError(403, "Such user does not exixst"))
     const{password, ...rest} = isAuser._doc
     return res.status(200).json(rest)

@@ -3,7 +3,7 @@ import dotenv from "dotenv"
 import cors from "cors"
 import authRouter from "./routes/auth.route.js"
 import errorHandler from "./middleware/errorHandler.js"
-import cookiepaser from "cookie-parser"
+import cookiePaser from "cookie-parser"
 import { dbConnect } from "./config/db.connect.js"
 import userRouter from "./routes/user.route.js"
 import postRouter from "./routes/post.route.js"
@@ -11,7 +11,7 @@ import postRouter from "./routes/post.route.js"
 dotenv.config()
 const app = express()
 app.use(express.json())
-app.use(cookiepaser({credentials: true}))
+app.use(cookiePaser({credentials: true}))
 app.use(express.urlencoded({extended: true}))
 const port = process.env.PORT || 5000
 

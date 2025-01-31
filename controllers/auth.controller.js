@@ -20,6 +20,11 @@ const signIn = async (req, res, next) => {
       process.env.SECRET_KEY
     );
 
+    const authToken = jwt.sign(
+      { id: validUser._id, userName: validUser.userName },
+      process.env.SECRET_KEY
+    );
+
     const{password, ...rest}= validUser._doc
 
     return res
@@ -30,7 +35,7 @@ const signIn = async (req, res, next) => {
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .status(200)
-      .json(rest);
+      .json({token: authToken, ...rest});
   } catch (err) {
     next(err);
   }
