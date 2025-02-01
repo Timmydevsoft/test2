@@ -24,9 +24,9 @@ const createUser = async(req, res, next)=>{
 
 const getAuser = async(req, res, next)=>{
   try{
-    console.log(req.params.id)
     const isAuser = await User.findById(req.params.id)
-    if(!isAuser) return next(handleError(403, "Such user does not exixst"))
+    if(!isAuser) return res.status(403).json({message: "No such user"})
+    if(isAuser.id.toString() !== req.id.toString()) return next(handleError(401, "You cant't oter users details"))
     const{password, ...rest} = isAuser._doc
     return res.status(200).json(rest)
   }
@@ -38,10 +38,11 @@ const getAuser = async(req, res, next)=>{
 
 const deleteUser = async (req, res, next) => {
   try {
-    if(!req.body.email || !req.body.password ) return next(handleError(400, "email or password cammot be emty"))
     if (req.id != req.params.id) return next(handleError(401, "You can only delete your own account"));
+    const isAuser = await User.findById(req.params.id)
+    if(!isAuser) return res.status(403).json({message:"No such user"})
      await User.findByIdAndDelete(req.params.id)
-     res.status(200).json({message: "Account deleted successfully"})
+     return res.status(200).json({message: "Account deleted successfully"})
   } catch (err) {
     next(err);
   }
@@ -59,15 +60,16 @@ const updateUser = async(req, res, next)=>{
     else {
       updatedHashedPassword = bcrypt.hashSync(req.body.password, 10);
     }
-    const updateUser = await User.findByIdAndUpdate(req.params.id, {
+    const isAuser = await User.findById(req.params.id)
+    if(!isAuser) return next(handleError(400, 'No such user'))
+    await User.findByIdAndUpdate(req.params.id, {
       $set: {
-        mail: req.body.mail,
+        email: req.body.email,
         password: updatedHashedPassword,
-        userName: req.body.userName,
+        username: req.body.username,
       },
     }, {new: true});
-    const{password,...rest} = updateUser._doc
-    return res.status(200).json(rest)
+    return res.status(200).json({message: "User updated sucessful"})
   }
   catch(err){
     next(err)

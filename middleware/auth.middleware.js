@@ -19,7 +19,7 @@ const verifyAuth = async (req, res, next) => {
           next()
         }
         else{
-          return res.status(401).json({message: "You are not authorized does not exist"})
+          return res.status(401).json({message: "You are not authorized"})
         } 
       });
     }

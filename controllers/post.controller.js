@@ -1,3 +1,4 @@
+import handleError from "../middleware/error.middleware.js";
 import Post from "../models/post.model.js";
 const createPost = async(req, res, next)=>{
     try{
@@ -33,6 +34,7 @@ const createPost = async(req, res, next)=>{
         const{id} = req.params
         const uniquePost = await Post.findById(id)
         if(!uniquePost) return res.status(403).json({message: "No such post"})
+        if(uniquePost.userId != req.id) return res.status(403).json({message: "You can't get post that's not yours"})
         res.status(200).json(uniquePost)
     }
     catch(err){
@@ -44,7 +46,8 @@ const createPost = async(req, res, next)=>{
   const updatePost = async(req, res, next)=>{
     try{
         const{id}=req.params
-        const uniquePost = await Post.findById(id, {})
+        const uniquePost = await Post.findById(id)
+        if(uniquePost.userId.toString() !== req.id.toString()) return next(handleError(403, "You can only update your own post"))
         if(!uniquePost) return res.status(403).json({message: "No such post"})
         if(uniquePost && uniquePost.userId == req.id){
              await Post.findByIdAndUpdate(req.params.id, {
@@ -66,7 +69,7 @@ const createPost = async(req, res, next)=>{
         const{id}= req.params
         const availablePost  = await Post.findById(id)
         if(!availablePost) return res.status(400).json({message: "No such post"})
-
+        if(availablePost.userId.toString() !== req.id.toString()) return next(handleError(401, "You can only delete your post"))
         if( availablePost && availablePost.userId == req.id){
             await Post.findByIdAndDelete(id)}
             return res.status(200).json({message: "Deleted successfully"})
