@@ -8,6 +8,8 @@ const createUser = async(req, res, next)=>{
     if(!username, !email, !password){
       return next(handleError(401, "username, mail and password required"))
     }
+    const isAuser = await User.findOne({email: email})
+    if(isAuser) return res.status(400).json({message: "email is already taken"})
     const hashedPassword =  bcrypt.hashSync(password, 10);
     const newUser = new User({
       username,
